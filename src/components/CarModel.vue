@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { onBeforeUnmount, onMounted, ref, shallowRef } from "vue";
 import initScenes from "../functions/scenes/initScenes";
 import CarHint from "./CarHint.vue";
+import LoaderView from "./LoaderView.vue";
 
 const carCanvas = ref<HTMLCanvasElement | null>(null);
 let camera: THREE.PerspectiveCamera;
@@ -71,8 +72,6 @@ onBeforeUnmount(() => {
 	gui?.destroy();
 	disposeScene?.();
 });
-
-const retryLoading = () => window.location.reload();
 </script>
 
 <template>
@@ -81,47 +80,17 @@ const retryLoading = () => window.location.reload();
 
 		<!-- 2. Исправлено: передаем модель и переименовали проп под объявление в CarHint -->
 		<CarHint
-			v-if="!loading && !loadError && modelObject"
+			v-if="modelObject"
 			:index="index"
 			:hint-visible="hintVisible"
 			:ready="modelReady"
 			:model="modelObject"
 		/>
 
-		<div
-			v-if="loading"
-			class="absolute inset-0 grid place-items-center bg-black text-white"
-			role="status"
-			aria-live="polite"
-		>
-			<div class="text-center">
-				<div
-					class="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-white/25 border-t-white"
-				/>
-				<p class="font-semibold">
-					Загрузка автомобиля…
-					<span v-if="loadProgress !== null"
-						>{{ Math.round(loadProgress * 100) }}%</span
-					>
-				</p>
-			</div>
-		</div>
-
-		<div
-			v-else-if="loadError"
-			class="absolute inset-0 grid place-items-center bg-black p-6 text-white"
-			role="alert"
-		>
-			<div class="max-w-md text-center">
-				<h2 class="text-2xl font-bold">Модель не загрузилась</h2>
-				<p class="mt-3 text-white/70">{{ loadError }}</p>
-				<button
-					class="mt-6 rounded-lg bg-white px-5 py-3 font-semibold text-black"
-					@click="retryLoading"
-				>
-					Повторить
-				</button>
-			</div>
-		</div>
+		<LoaderView
+			:loading="loading"
+			:error="loadError"
+			:progress="loadProgress"
+		></LoaderView>
 	</div>
 </template>

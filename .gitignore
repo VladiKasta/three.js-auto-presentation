@@ -15,6 +15,7 @@ dist-ssr
 *.gltf
 *.bin
 !src/assets/2014_porsche_911_turbo_991.glb
+!src/assets/*_logo.glb
 
 # Editor directories and files
 .vscode/*

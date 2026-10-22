@@ -12,7 +12,15 @@ export const competitors: Car[] = [
 		name: "Porsche",
 		model: "911 Carrera",
 		power: 650,
-		color: "#ff6a00",
+		/* 	color: "#ff6a00", */
+		color: "#484e59",
+	},
+	{
+		id: "audi",
+		name: "Audi",
+		model: "RS5",
+		power: 450,
+		color: "#484e59",
 	},
 	{
 		id: "bmw",
@@ -26,13 +34,6 @@ export const competitors: Car[] = [
 		name: "Mercedes-Benz",
 		model: "AMG C63",
 		power: 510,
-		color: "#484e59",
-	},
-	{
-		id: "audi",
-		name: "Audi",
-		model: "RS5",
-		power: 450,
 		color: "#484e59",
 	},
 	{

@@ -1,8 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import CharacteristicsView from "../view/CharacteristicsView.vue";
-import Main from "../view/Main.vue";
-
 const router = createRouter({
 	history: createWebHistory(),
 
@@ -10,12 +7,12 @@ const router = createRouter({
 		{
 			path: "/",
 			name: "home",
-			component: Main,
+			component: () => import("../view/Main.vue"),
 		},
 		{
 			path: "/characteristics",
 			name: "characteristics",
-			component: CharacteristicsView,
+			component: () => import("../view/CharacteristicsView.vue"),
 		},
 	],
 });

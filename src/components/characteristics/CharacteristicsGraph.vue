@@ -1,57 +1,64 @@
 <script setup lang="ts">
+import * as THREE from "three";
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import createVerticalLine from "../../functions/scenes/createVerticalLine.ts";
 import initScenes from "../../functions/scenes/initScenes";
+import LoaderView from "../LoaderView.vue";
 import Menu from "../Menu.vue";
 import MenuBody from "../MenuBody.vue";
+import CharacteristicsText from "./CharacteristicsText.vue";
 import { competitors } from "./competitors.ts";
-import createFloor from "./createFloor.ts";
-import createGeometries from "./createGeometries.ts";
+import createCharacteristicsRuntime from "./createCharactiristicsRuntime.ts";
+import initRaycaster from "./initRaycaster.ts";
+import interractOnClick from "./interractOnClick.ts";
+
 //import createRoom from "./createRoom.ts";
 
+const finished = ref(false);
+const loadingError = ref<string>("");
+let result: ReturnType<typeof initScenes> = {} as ReturnType<typeof initScenes>;
 const characteristicsCanvas = ref<HTMLCanvasElement | null>(null);
-const myltiply = ref(0);
-const maxCharacteristic = Math.max(...competitors.map((c) => c.power));
+const activeCarId = ref(competitors[0].id);
 
-let result: ReturnType<typeof initScenes>;
-const step = 2;
+//const choosenObject = ref<Object3D | null>(null);
+let raycasterCanvasClick:
+	((event: MouseEvent) => THREE.Mesh | undefined) | null = null;
+
+function canvasClick(event: MouseEvent) {
+	const object = raycasterCanvasClick?.(event);
+	if (!object) return;
+
+	interractOnClick(result.scene, object);
+	activeCarId.value = object.userData.competitorId as string;
+}
 
 onMounted(() => {
 	result = initScenes("/characteristics", characteristicsCanvas.value!);
-
-	createGeometries(maxCharacteristic, step, result.scene);
-	//createRoom(result.scene);
-	const floor = createFloor(step);
-	const verticalLine = createVerticalLine({
-		height: 7,
-		floor,
+	createCharacteristicsRuntime({ result, finished, loadingError });
+	const raycaster = initRaycaster({
+		characteristicsCanvas,
+		result,
 	});
 
-	result.scene.add(floor);
-	result.scene.add(verticalLine);
+	raycasterCanvasClick = raycaster.canvasClick;
 });
 
 onBeforeUnmount(() => {
-	console.log("first");
+	raycasterCanvasClick = null;
 	result.dispose();
 });
 </script>
 
 <template>
-	<button class="muly relative text-amber-400" @click="myltiply++">
-		прибавить {{ myltiply }}
-	</button>
 	<Menu></Menu>
 	<MenuBody ref="menuBody"></MenuBody>
+
+	<CharacteristicsText :active-car-id="activeCarId"></CharacteristicsText>
 
 	<canvas
 		ref="characteristicsCanvas"
 		class="characteristics-model fixed inset-0 h-screen w-full"
+		@click="canvasClick($event)"
 	/>
-</template>
 
-<style scoped>
-.muly {
-	z-index: 100;
-}
-</style>
+	<LoaderView :loading="!finished" :load-error="loadingError" />
+</template>
