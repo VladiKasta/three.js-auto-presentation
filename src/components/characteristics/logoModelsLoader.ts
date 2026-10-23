@@ -6,11 +6,7 @@ import bmwLogoUrl from "../../assets/bmw_logo.glb?url";
 import mercedesLogoUrl from "../../assets/mercedes_logo.glb?url";
 import porscheLogoUrl from "../../assets/porsche_logo.glb?url";
 import teslaLogoUrl from "../../assets/tesla_logo.glb?url";
-
-type CarModelConfig = {
-	url: string;
-	color?: number;
-};
+import { type CarModelConfig } from "../../types/types";
 
 const SILVER_COLOR = 0xc0c0c0;
 

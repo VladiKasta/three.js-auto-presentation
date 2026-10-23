@@ -2,17 +2,15 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { shallowRef } from "vue";
 import createObjectMap from "../createObjectMap";
-import modelLoader, { type ModelLoadProgress } from "../modelLoader";
+import modelLoader, { type ModelLoadProgress } from "../api/modelLoader";
 import createSceneRuntime, { disposeObject } from "./createSceneRuntime";
 
 export type InitHomeSceneOptions = {
 	onProgress?: ModelLoadProgress;
+	mode?: "draft" | "published";
 };
 
-function addStudioLighting(
-	scene: THREE.Scene,
-	renderer: THREE.WebGLRenderer,
-) {
+function addStudioLighting(scene: THREE.Scene, renderer: THREE.WebGLRenderer) {
 	const hemisphere = new THREE.HemisphereLight(0xdde7ff, 0x090706, 0.25);
 
 	const keyLight = new THREE.DirectionalLight(0xfff4e8, 1.6);
@@ -95,15 +93,19 @@ export default function initHomeScene(
 		cameraPosition: [0, 3, 5],
 		defaultLights: false,
 	});
+
 	const modelObject = shallowRef<THREE.Object3D | null>(null);
 
 	runtime.renderer.shadowMap.enabled = true;
 	runtime.renderer.shadowMap.type = THREE.PCFShadowMap;
 	runtime.renderer.toneMappingExposure = 0.85;
 	runtime.renderer.outputColorSpace = THREE.SRGBColorSpace;
+
 	runtime.onDispose(addStudioLighting(runtime.scene, runtime.renderer));
 
-	const modelReady = modelLoader(options.onProgress).then((model) => {
+	const mode = options.mode ?? "published";
+
+	const modelReady = modelLoader(options.onProgress, mode).then((model) => {
 		if (runtime.isDisposed()) {
 			disposeObject(model);
 			return;
@@ -111,7 +113,9 @@ export default function initHomeScene(
 
 		const map = createObjectMap(model);
 		console.log(map);
+
 		prepareCarForStudio(model, runtime.scene);
+
 		runtime.scene.add(model);
 		modelObject.value = model;
 	});

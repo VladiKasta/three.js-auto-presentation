@@ -1,3 +1,4 @@
+import getSceneMode from "../../utils/getSceneMode";
 import initCharacteristicsScene from "../initCharacteristicsScene";
 import initHomeScene, { type InitHomeSceneOptions } from "./initHomeScene";
 
@@ -8,10 +9,12 @@ function initScenes(
 	canvas: HTMLCanvasElement,
 	options?: InitHomeSceneOptions,
 ): ReturnType<typeof initHomeScene>;
+
 function initScenes(
 	path: "/characteristics",
 	canvas: HTMLCanvasElement,
 ): ReturnType<typeof initCharacteristicsScene>;
+
 function initScenes(
 	path: ScenePath,
 	canvas: HTMLCanvasElement,
@@ -19,6 +22,7 @@ function initScenes(
 ):
 	| ReturnType<typeof initHomeScene>
 	| ReturnType<typeof initCharacteristicsScene>;
+
 function initScenes(
 	path: ScenePath,
 	canvas: HTMLCanvasElement,
@@ -26,7 +30,11 @@ function initScenes(
 ) {
 	switch (path) {
 		case "/":
-			return initHomeScene(canvas, options);
+			return initHomeScene(canvas, {
+				...options,
+				mode: options.mode ?? getSceneMode(),
+			});
+
 		case "/characteristics":
 			return initCharacteristicsScene(canvas);
 	}

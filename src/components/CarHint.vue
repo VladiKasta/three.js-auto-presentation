@@ -1,85 +1,29 @@
 <script setup lang="ts">
 import * as THREE from "three";
 import { onBeforeUnmount, onMounted, ref } from "vue";
+import loadSlides from "../functions/api/slidesLoader.ts";
 import createScrollTimeline from "../functions/createScrollTimeline";
+import type { Slide } from "../types/types.ts";
+import getPositionStyles from "../utils/getPositionStyles.ts";
+import getSceneMode from "../utils/getSceneMode.ts";
 import Menu from "./Menu.vue";
 import MenuBody from "./MenuBody.vue";
 
-type SlidePosition = {
-	top?: string;
-	left?: string;
-	right?: string;
-	bottom?: string;
-	transform?: string;
-};
-
-type Slide = {
-	number: string;
-	title: string;
-	text: string;
-	advantages: string[];
-	position: SlidePosition;
-};
-
-const slides: Slide[] = [
-	{
-		number: "01",
-		title: "Передняя часть",
-		text: "Фирменные Matrix LED-фары обеспечивают превосходную видимость и автоматически адаптируются к дорожной обстановке.",
-		advantages: [
-			"Адаптивное освещение",
-			"Matrix LED-оптика",
-			"Динамические поворотники",
-			"Спортивный дизайн передней части",
-		],
-		position: {
-			top: "50%",
-			left: "5%",
-			transform: "translateY(-50%)",
-		},
-	},
-	{
-		number: "02",
-		title: "Задняя часть",
-		text: "Спортивная выхлопная система подчеркивает характер автомобиля и обеспечивает насыщенное звучание двигателя.",
-		advantages: [
-			"Активный выхлоп",
-			"Диффузор",
-			"Светодиодная полоса фонарей",
-			"Улучшенная аэродинамика",
-		],
-		position: {
-			right: "5%",
-			bottom: "12%",
-		},
-	},
-	{
-		number: "03",
-		title: "Производительность",
-		text: "Оппозитный двигатель с двойным турбонаддувом обеспечивает мгновенный отклик и впечатляющую динамику.",
-		advantages: [
-			"Полный привод",
-			"Разгон 0–100 км/ч за 3 секунды",
-			"7-ступенчатая коробка PDK",
-			"Porsche Active Suspension Management",
-		],
-		position: {
-			bottom: "9%",
-			left: "5%",
-		},
-	},
-];
+const slides = ref<Slide[]>([]);
 
 const props = defineProps<{
 	model: THREE.Object3D;
 }>();
 
-const presentation = ref<HTMLElement | null>(null);
+const presentation = ref<HTMLElement>();
 let disposeTimeline: (() => void) | null = null;
 
 onMounted(() => {
 	if (!presentation.value) return;
-	disposeTimeline = createScrollTimeline(props.model, presentation.value);
+	loadSlides(getSceneMode(), slides).then(() => {
+		if (!presentation.value) return;
+		disposeTimeline = createScrollTimeline(props.model, presentation.value!);
+	});
 });
 
 onBeforeUnmount(() => {
@@ -104,12 +48,15 @@ onBeforeUnmount(() => {
 		<section v-for="slide in slides" :key="slide.number" class="story-scene">
 			<div class="scene-shade" aria-hidden="true" />
 
-			<div class="story-card-positioner" :style="slide.position">
+			<div
+				class="story-card-positioner"
+				:style="getPositionStyles(slide.position)"
+			>
 				<article class="story-card scene-content">
 					<div class="story-card__header">
 						<span class="story-card__number">{{ slide.number }}</span>
 						<span class="story-card__line" aria-hidden="true" />
-						<span class="story-card__label">Porsche 911 Turbo</span>
+						<!-- <span class="story-card__label">Porsche 911 Turbo</span> -->
 					</div>
 
 					<h2>{{ slide.title }}</h2>
@@ -136,6 +83,4 @@ onBeforeUnmount(() => {
 	</main>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

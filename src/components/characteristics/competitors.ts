@@ -1,10 +1,4 @@
-export type Car = {
-	id: string;
-	name: string;
-	model: string;
-	power: number;
-	color: string;
-};
+import { type Car } from "../../types/types";
 
 export const competitors: Car[] = [
 	{
